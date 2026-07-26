@@ -1,21 +1,36 @@
-import requests
-
-THUNDERSKILL_URL = "https://thunderskill.com/en/squad/%5BTAIKO%5D/export/json"
-
-print("Descargando datos de ThunderSkill...")
-
-response = requests.get(THUNDERSKILL_URL, timeout=30)
-response.raise_for_status()
-
-data = response.json()
-
-print("\n=== INFORMACIÓN DEL ESCUADRÓN ===\n")
-
-# Mostrar todas las claves disponibles
 import json
+from stats import get_average_stat, get_top_players
 
-print("\n=== SQUAD INFO ===\n")
-print(json.dumps(data["squadinfo"], indent=4, ensure_ascii=False))
+from thunderskill import (
+    download_data,
+    get_players,
+    get_squad_info
+)
 
-print("\n=== PRIMER JUGADOR ===\n")
-print(json.dumps(data["players"][0], indent=4, ensure_ascii=False))
+print("Descargando datos...")
+
+data = download_data()
+
+squad = get_squad_info(data)
+players = get_players(data)
+
+print("\n===== TOP 10 KD SIMULATOR =====\n")
+
+top = get_top_players(
+    players,
+    "s",
+    "kd",
+    limit=10,
+    min_battles=50
+)
+
+print("\n===== TOP KD SIMULATOR =====\n")
+
+for i, player in enumerate(top, start=1):
+
+    print(
+        f"{i:2}. "
+        f"{player['nick']:<20}"
+        f"KD: {player['s']['kd']:<5} "
+        f"WR: {player['s']['winrate']}%"
+    )

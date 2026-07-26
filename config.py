@@ -1,0 +1,1 @@
+THUNDERSKILL_URL = "https://thunderskill.com/en/squad/%5BTAIKO%5D/export/json"
