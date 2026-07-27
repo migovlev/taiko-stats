@@ -4,7 +4,6 @@ class SquadronStats:
         self.squad = squad_info
         self.players = players
 
-
     def average(self, mode, stat):
         values = []
 
@@ -13,25 +12,23 @@ class SquadronStats:
             if mode not in player:
                 continue
 
-            if stat not in player[mode]:
-                continue
-
-            value = player[mode][stat]
+            stats = player[mode] or {}
+            value = stats.get(stat)
 
             if value is None:
                 continue
 
-            values.append(value)
+            try:
+                values.append(float(value))
+            except (TypeError, ValueError):
+                continue
 
         if not values:
             return 0
 
         return round(sum(values) / len(values), 2)
-        
-
 
     def top(self, mode, stat, limit=10, min_battles=0):
-
         ranking = []
 
         for player in self.players:
@@ -39,28 +36,36 @@ class SquadronStats:
             if mode not in player:
                 continue
 
-            stats = player[mode]
+            stats = player[mode] or {}
 
             if stat not in stats:
                 continue
 
-            if stats.get("mission", 0) < min_battles:
+            missions = stats.get("mission") or 0
+            value = stats.get(stat)
+
+            if value is None:
                 continue
 
-            if stats[stat] is None:
+            try:
+                missions = int(missions)
+                float(value)
+            except (TypeError, ValueError):
+                continue
+
+            if missions < min_battles:
                 continue
 
             ranking.append(player)
 
         ranking.sort(
-            key=lambda p: p[mode][stat],
+            key=lambda p: float(p[mode][stat] or 0),
             reverse=True
         )
 
         return ranking[:limit]
 
     def best_player(self, mode, stat, min_battles=0):
-
         ranking = self.top(
             mode,
             stat,
@@ -71,17 +76,9 @@ class SquadronStats:
         if not ranking:
             return None
 
-        return ranking[0] 
+        return ranking[0]
 
     def dashboard(self, mode="s", min_battles=50):
-        """
-        Genera un resumen general del escuadrón.
-
-        Parámetros:
-            mode: "a", "r" o "s"
-            min_battles: misiones mínimas para rankings de rendimiento
-        """
-
         best_kd = self.best_player(
             mode,
             "kd",
@@ -112,4 +109,4 @@ class SquadronStats:
             "best_kd": best_kd,
             "best_winrate": best_winrate,
             "most_active": most_active
-        }    
+        }

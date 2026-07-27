@@ -5,7 +5,7 @@ from thunderskill import (
 )
 
 from stats import SquadronStats
-from discord_webhook import send_dashboard
+from discord_webhook import send_dashboard, send_top_kpd
 
 
 MODE = "s"
@@ -24,10 +24,27 @@ def main():
         mode=MODE,
         min_battles=MIN_BATTLES
     )
+    top_simulator = stats.top(
+        mode="s",
+        stat="kpd",
+        limit=5,
+        min_battles=50
+    )
+
+    top_realistic = stats.top(
+        mode="r",
+        stat="kpd",
+        limit=5,
+        min_battles=50
+    )
 
     send_dashboard(
         dashboard,
         mode=MODE
+    )
+    send_top_kpd(
+        top_simulator=top_simulator,
+        top_realistic=top_realistic
     )
 
 
