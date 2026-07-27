@@ -201,7 +201,7 @@ def send_top_kpd(top_simulator, top_realistic):
             }
         ],
         "footer": {
-            "text": "Mínimo de 50 partidas"
+            "text": "Mostrando Mínimo de 50 partidas"
         }
     }
 
