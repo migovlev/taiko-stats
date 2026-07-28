@@ -2,6 +2,8 @@ import requests
 
 from config import DISCORD_WEBHOOK_URL
 
+from squad_performance import format_change
+
 
 MODE_NAMES = {
     "a": "Arcade",
@@ -147,9 +149,9 @@ def format_top_kpd(players, mode):
             difference = float(kpd) - float(previous_kpd)
             
             if difference > 0:
-                comparison = f"📈 +{difference:.2f}"
+                comparison = f" +{difference:.2f}"
             elif difference < 0:
-                comparison = f"📉 {difference:.2f}"
+                comparison = f" {difference:.2f}"
             else:
                 comparison = "➖ 0.00"       
 
@@ -163,9 +165,14 @@ def format_top_kpd(players, mode):
     return "\n\n".join(lines)
 
 
-def send_top_kpd(top_simulator, top_realistic):
+def send_top_kpd(
+    top_simulator,
+    top_realistic,
+    current_performance,
+    previous_performance
+):
     """
-    REEMPLAZADO PARA MOSTRAR KPD Y NO KD
+    Envía el Top 5 KPD y la eficiencia general del escuadrón.
     """
 
     if not DISCORD_WEBHOOK_URL:
@@ -183,7 +190,40 @@ def send_top_kpd(top_simulator, top_realistic):
         mode="r"
     )
 
-    embed = {
+    previous_a = (
+        previous_performance.get("a")
+        if previous_performance
+        else None
+    )
+
+    previous_r = (
+        previous_performance.get("r")
+        if previous_performance
+        else None
+    )
+
+    previous_s = (
+        previous_performance.get("s")
+        if previous_performance
+        else None
+    )
+
+    change_a = format_change(
+        current_performance["a"],
+        previous_a
+    )
+
+    change_r = format_change(
+        current_performance["r"],
+        previous_r
+    )
+
+    change_s = format_change(
+        current_performance["s"],
+        previous_s
+    )
+
+    top_embed = {
         "title": "🏆 Top 5 Eficiencia en Batallas",
         "description": (
             "Mejores jugadores del escuadrón en batallas "
@@ -203,18 +243,74 @@ def send_top_kpd(top_simulator, top_realistic):
             }
         ],
         "footer": {
-            "text": "Mostrando Mínimo de 50 partidas"
+            "text": "Mostrando mínimo de 50 partidas"
         }
+    }
+
+    performance_embed = {
+        "title": "🌸 Eficiencia del escuadrón 🌸",
+        "description": (
+            "**[TAIKO] Tainan Sim Group**."
+        ),
+        "color": 16230584,
+        "fields": [
+            {
+                "name": "🕹️ Arcade",
+                "value": (
+                    f"⭐ **{current_performance['a']:.2f}**\n"
+                    f"{change_a}"
+                ),
+                "inline": True
+            },
+            {
+                "name": "⚔️ Realista",
+                "value": (
+                    f"⭐ **{current_performance['r']:.2f}**\n"
+                    f"{change_r}"
+                ),
+                "inline": True
+            },
+            {
+                "name": "🛩️ Simulador",
+                "value": (
+                    f"⭐ **{current_performance['s']:.2f}**\n"
+                    f"{change_s}"
+                ),
+                "inline": True
+            }
+        ],
+        "footer": {
+            "text": "Variación respecto a la actualización anterior"
+        }
+    }
+
+    payload = {
+        "username": "TAIKO Stats",
+        "embeds": [
+            top_embed,
+            performance_embed
+        ]
     }
 
     response = requests.post(
         DISCORD_WEBHOOK_URL,
-        json={
-            "embeds": [embed]
-        },
+        json=payload,
         timeout=15
     )
 
-    response.raise_for_status()
+    print(
+        f"Discord respondió con código "
+        f"{response.status_code}"
+    )
 
-    print("Embed Top 5 KpD enviado correctamente.")    
+    if response.status_code not in (200, 204):
+        raise RuntimeError(
+            f"Discord respondió con el código "
+            f"{response.status_code}: "
+            f"{response.text}"
+        )
+
+    print(
+        "Embed Top 5 y eficiencia del escuadrón "
+        "enviados correctamente."
+    )
