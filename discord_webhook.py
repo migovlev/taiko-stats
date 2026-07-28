@@ -107,6 +107,8 @@ def send_dashboard(dashboard, mode="s"):
         timeout=15
     )
 
+    print(f"Discord respondió con código {response.status_code}")
+    
     if response.status_code not in (200, 204):
         raise RuntimeError(
             f"Discord respondió con el código "
@@ -155,7 +157,7 @@ def format_top_kpd(players, mode):
 
         lines.append(
             f"{medal} **{nickname}**\n"
-            f"`KPD {float(kpd):.2f}` {comparison} · {int(missions)} partidas"
+            f"`{float(kpd):.2f}` {comparison} · {int(missions)} partidas"
         )
 
     return "\n\n".join(lines)
