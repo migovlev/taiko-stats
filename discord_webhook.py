@@ -253,6 +253,10 @@ def send_top_kpd(
             "**[TAIKO] Tainan Sim Group**."
         ),
         "color": 16230584,
+
+        "thumbnail": {
+        "url": "https://i.ibb.co/fYy4n1QP/logo-tainan-pequ-o.png"
+    },
         "fields": [
             {
                 "name": "🕹️ Arcade",
