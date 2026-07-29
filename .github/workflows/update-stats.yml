@@ -40,6 +40,4 @@ jobs:
 
           git add squad_history.json
           git diff --cached --quiet || git commit -m "chore: update squad performance history"
-
-          git pull --rebase origin main
           git push origin main
