@@ -3,9 +3,15 @@ from thunderskill import (
     get_players,
     get_squad_info
 )
+from weekly_performance import (
+    load_weekly_history,
+    create_current_snapshot,
+    calculate_weekly_performance,
+    save_weekly_history
+)
 
 from stats import SquadronStats
-from discord_webhook import send_dashboard, send_top_kpd
+from discord_webhook import send_dashboard, send_weekly_performance, send_squad_performance
 from squad_performance import (
     get_current_performance,
     load_previous_performance,
@@ -24,23 +30,30 @@ def main():
 
     stats = SquadronStats(squad, players)
 
+
+    previous_weekly = load_weekly_history()
+
+    weekly_simulator = calculate_weekly_performance(
+    players=players,
+    previous_history=previous_weekly,
+    mode="s",
+    limit=5,
+    min_battles=20
+)
+
+    weekly_realistic = calculate_weekly_performance(
+    players=players,
+    previous_history=previous_weekly,
+    mode="r",
+    limit=5,
+    min_battles=20
+)
+
     dashboard = stats.dashboard(
         mode=MODE,
         min_battles=MIN_BATTLES
     )
-    top_simulator = stats.top(
-        mode="s",
-        stat="kpd",
-        limit=5,
-        min_battles=50
-    )
 
-    top_realistic = stats.top(
-        mode="r",
-        stat="kpd",
-        limit=5,
-        min_battles=50
-    )
     current_performance = get_current_performance(data)
     previous_performance = load_previous_performance()
 
@@ -48,13 +61,24 @@ def main():
         dashboard,
         mode=MODE
     )
-    send_top_kpd(
-        top_simulator=top_simulator,
-        top_realistic=top_realistic,
-        current_performance=current_performance,
-        previous_performance=previous_performance
+
+
+    send_weekly_performance(
+    top_simulator=weekly_simulator,
+    top_realistic=weekly_realistic
+    )
+
+    send_squad_performance(
+    current_performance=current_performance,
+    previous_performance=previous_performance
+    
     )
     save_current_performance(current_performance)
+    
+    
+    current_weekly = create_current_snapshot(players)
+
+    save_weekly_history(current_weekly)
 
 if __name__ == "__main__":
     main()

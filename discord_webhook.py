@@ -318,3 +318,209 @@ def send_top_kpd(
         "Embed Top 5 y eficiencia del escuadrón "
         "enviados correctamente."
     )
+
+def format_weekly_players(players):
+    if not players:
+        return (
+            "Aún no hay suficientes datos semanales "
+            "o jugadores con 20+ partidas."
+        )
+
+    lines = []
+
+    for position, player in enumerate(players):
+        medal = MEDALS[position]
+
+        lines.append(
+            f"{medal} **{player['nick']}**\n"
+            f"🏆 `{player['winrate']:.2f}% WR` · "
+            f"🎮 `{player['battles']} partidas` · "
+            f"✅ `{player['wins']} victorias`"
+        )
+
+    return "\n\n".join(lines)
+
+def send_weekly_performance(
+    top_simulator,
+    top_realistic
+):
+    """
+    Envía el Top 5 de rendimiento del período.
+    """
+
+    if not DISCORD_WEBHOOK_URL:
+        raise ValueError(
+            "No se encontró la variable de entorno "
+            "DISCORD_WEBHOOK_URL."
+        )
+
+    simulator_text = format_weekly_players(
+        top_simulator
+    )
+
+    realistic_text = format_weekly_players(
+        top_realistic
+    )
+
+    embed = {
+        "title": "📊 Top 5 Rendimiento Semanal",
+        "description": (
+            "Rendimiento obtenido desde la última "
+            "actualización de estadísticas."
+        ),
+        "color": 16230584,
+
+        "fields": [
+            {
+                "name": "🛩️ Simulador",
+                "value": simulator_text,
+                "inline": True
+            },
+            {
+                "name": "⚔️ Realista",
+                "value": realistic_text,
+                "inline": True
+            }
+        ],
+        "footer": {
+            "text": (
+                "Mínimo 20 partidas durante el período"
+            )
+        }
+    }
+
+    response = requests.post(
+        DISCORD_WEBHOOK_URL,
+        json={
+            "username": "TAIKO Stats",
+            "embeds": [embed]
+        },
+        timeout=15
+    )
+
+    print(
+        f"Discord respondió con código "
+        f"{response.status_code}"
+    )
+
+    if response.status_code not in (200, 204):
+        raise RuntimeError(
+            f"Discord respondió con el código "
+            f"{response.status_code}: "
+            f"{response.text}"
+        )
+
+    print(
+        "Embed de rendimiento semanal "
+        "enviado correctamente."
+    )
+
+def send_squad_performance(
+    current_performance,
+    previous_performance
+):
+    if not DISCORD_WEBHOOK_URL:
+        raise ValueError(
+            "No se encontró la variable de entorno "
+            "DISCORD_WEBHOOK_URL."
+        )
+
+    previous_a = (
+        previous_performance.get("a")
+        if previous_performance
+        else None
+    )
+
+    previous_r = (
+        previous_performance.get("r")
+        if previous_performance
+        else None
+    )
+
+    previous_s = (
+        previous_performance.get("s")
+        if previous_performance
+        else None
+    )
+
+    change_a = format_change(
+        current_performance["a"],
+        previous_a
+    )
+
+    change_r = format_change(
+        current_performance["r"],
+        previous_r
+    )
+
+    change_s = format_change(
+        current_performance["s"],
+        previous_s
+    )
+
+    embed = {
+        "title": "🏆 Eficiencia del escuadrón",
+        "description": (
+            "Rendimiento general de "
+            "**[TAIKO] Tainan Sim Group**."
+        ),
+        "color": 16230584,
+        "thumbnail": {
+        "url": "https://i.ibb.co/fYy4n1QP/logo-tainan-pequ-o.png"
+        },
+        "fields": [
+            {
+                "name": "🕹️ Arcade",
+                "value": (
+                    f"⭐ **{current_performance['a']:.2f}**\n"
+                    f"{change_a}"
+                ),
+                "inline": True
+            },
+            {
+                "name": "⚔️ Realista",
+                "value": (
+                    f"⭐ **{current_performance['r']:.2f}**\n"
+                    f"{change_r}"
+                ),
+                "inline": True
+            },
+            {
+                "name": "🛩️ Simulador",
+                "value": (
+                    f"⭐ **{current_performance['s']:.2f}**\n"
+                    f"{change_s}"
+                ),
+                "inline": True
+            }
+        ],
+        "footer": {
+            "text": "Variación respecto a la actualización anterior"
+        }
+    }
+
+    response = requests.post(
+        DISCORD_WEBHOOK_URL,
+        json={
+            "username": "TAIKO Stats",
+            "embeds": [embed]
+        },
+        timeout=15
+    )
+
+    print(
+        f"Discord respondió con código "
+        f"{response.status_code}"
+    )
+
+    if response.status_code not in (200, 204):
+        raise RuntimeError(
+            f"Discord respondió con el código "
+            f"{response.status_code}: "
+            f"{response.text}"
+        )
+
+    print(
+        "Embed de eficiencia del escuadrón "
+        "enviado correctamente."
+    )    
