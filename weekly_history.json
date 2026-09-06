@@ -69,16 +69,6 @@
             "win": 4068
         }
     },
-    "Mr_origami": {
-        "s": {
-            "mission": 259,
-            "win": 135
-        },
-        "r": {
-            "mission": 15789,
-            "win": 7898
-        }
-    },
     "El_Francis": {
         "s": {
             "mission": 53,
@@ -165,8 +155,8 @@
             "win": 5
         },
         "r": {
-            "mission": 3514,
-            "win": 1801
+            "mission": 3962,
+            "win": 2024
         }
     },
     "ElPibeYuto@psn": {
@@ -187,6 +177,16 @@
         "r": {
             "mission": 0,
             "win": 0
+        }
+    },
+    "frisbi1": {
+        "s": {
+            "mission": 1391,
+            "win": 618
+        },
+        "r": {
+            "mission": 10177,
+            "win": 5438
         }
     },
     "Nagasee": {
@@ -260,6 +260,16 @@
         }
     },
     "Alejandro1103": {
+        "s": {
+            "mission": 0,
+            "win": 0
+        },
+        "r": {
+            "mission": 0,
+            "win": 0
+        }
+    },
+    "молитва монолита": {
         "s": {
             "mission": 0,
             "win": 0
