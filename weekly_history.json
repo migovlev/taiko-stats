@@ -19,6 +19,16 @@
             "win": 1780
         }
     },
+    "Lain Iwakura神": {
+        "s": {
+            "mission": 35,
+            "win": 17
+        },
+        "r": {
+            "mission": 4418,
+            "win": 2207
+        }
+    },
     "оригамиッ": {
         "s": {
             "mission": 119,
@@ -187,16 +197,6 @@
         "r": {
             "mission": 10177,
             "win": 5438
-        }
-    },
-    "Nagasee": {
-        "s": {
-            "mission": 35,
-            "win": 24
-        },
-        "r": {
-            "mission": 4871,
-            "win": 2539
         }
     },
     "LycorisSheep": {
